@@ -96,19 +96,20 @@ between them.
 
 ## Installation
 
-TileOPs installs from source; a PyPI release lands with the first stable version. A
-CUDA-capable GPU is required.
+TileOPs installs from source. This branch adds Ascend 950 implementations alongside
+the upstream CUDA implementations. Ascend users should follow the
+[950 environment, shared benchmark and CI guide](docs/ascend950/development.md).
 
-**Prerequisites** — the one combination a release is verified on and declares:
+**CUDA development prerequisites**:
 
 - Python 3.12
 - PyTorch 2.13
 - CUDA Toolkit 13.2
 - A GPU of compute capability 9.0 (SM90), tested on H200
-- [TileLang](https://github.com/tile-ai/tilelang) 0.1.12 — see [development.md](https://github.com/tile-ai/TileOPs/blob/main/docs/development.md#dev-docker-image)
+- [TileLang](https://github.com/tile-ai/tilelang) 0.1.15
 
 ```bash
-git clone https://github.com/tile-ai/TileOPs
+git clone -b ascend950 https://github.com/yyttt6/TileOPs
 cd TileOPs
 pip install -e '.[dev]' -c constraints.txt   # constraints.txt pins what CI validates
 pre-commit install
@@ -116,9 +117,10 @@ pre-commit install
 python -m pytest -q tests -m smoke           # verify; requires a CUDA GPU
 ```
 
-A prebuilt Docker image carries the whole stack and is the environment CI runs in — see
-[development.md](https://github.com/tile-ai/TileOPs/blob/main/docs/development.md#dev-docker-image), along with test tiers, benchmarks, and
-build troubleshooting.
+For CUDA container setup, test tiers and build troubleshooting, see
+[development.md](docs/development.md#dev-docker-image). The upstream image carries
+TileLang 0.1.12; this branch requires 0.1.15. GPU hardware validation of the new
+version is separate from the Ascend 950 CI.
 
 ## Documentation
 

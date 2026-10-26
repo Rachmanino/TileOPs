@@ -17,12 +17,12 @@ def swizzle(tile_idx):
             local = within % 32
             m_tile = superrow * 4 + local % 4
             n_group = T.Select(superrow % 2 == 0, group, 4 - group)
-            n_tile = n_group * 8 + ((local // 4) ^ (local % 4))
+            n_tile = n_group * 8 + (local // 4 ^ local % 4)
         else:
             remainder = within - 160
             m_tile = superrow * 4 + remainder % 4
             n_tile = 40 + remainder // 4
-    return m_tile, n_tile
+    return (m_tile, n_tile)
 
 
 @T.prim_func
@@ -31,7 +31,7 @@ def main(
     B: T.Tensor((7168, 2048), "bfloat16"),
     D: T.Tensor((4096, 7168), "bfloat16"),
 ):
-    with T.Kernel(36) as bx:  # noqa: SIM117 - Keep the measured TileLang scope structure.
+    with T.Kernel(36) as bx:  # noqa: SIM117 - Preserve measured TileLang scopes.
         with T.Cube():
             a_l0 = T.alloc_l0a((2, 256, 64), "bfloat16")
             a_l1 = T.alloc_l1((4, 256, 128), "bfloat16")
@@ -1297,550 +1297,303 @@ def main(
                     T.copy(b_l1[2, 0:80, 64:128], b_l0[1, :80, :])
                     T.ascend_set_flag("MTE1_M", 3)
                     T.ascend_set_flag("MTE1_MTE2", 6)
-                    T.copy(B[n_base : n_base + 128, 384:512], b_l1[3, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 7)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 3)
-                    T.copy(a_l1[3, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 0)
-                    T.copy(A[m_base : m_base + 256, 512:640], a_l1[0, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 0)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 7)
-                    T.copy(b_l1[3, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[3, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 3)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[3, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[3, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[3, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 7)
-                    T.ascend_wait_flag("MTE1_MTE2", 4)
-                    T.copy(B[n_base : n_base + 128, 512:640], b_l1[0, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 4)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 0)
-                    T.copy(a_l1[0, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 1)
-                    T.copy(A[m_base : m_base + 256, 640:768], a_l1[1, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 1)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 4)
-                    T.copy(b_l1[0, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[0, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 0)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[0, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[0, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[0, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 4)
-                    T.ascend_wait_flag("MTE1_MTE2", 5)
-                    T.copy(B[n_base : n_base + 128, 640:768], b_l1[1, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 1)
-                    T.copy(a_l1[1, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 2)
-                    T.copy(A[m_base : m_base + 256, 768:896], a_l1[2, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 5)
-                    T.copy(b_l1[1, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[1, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 1)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[1, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[1, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[1, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 5)
-                    T.ascend_wait_flag("MTE1_MTE2", 6)
-                    T.copy(B[n_base : n_base + 128, 768:896], b_l1[2, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 6)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 2)
-                    T.copy(a_l1[2, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 3)
-                    T.copy(A[m_base : m_base + 256, 896:1024], a_l1[3, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 6)
-                    T.copy(b_l1[2, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[2, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 2)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[2, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[2, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[2, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 6)
-                    T.ascend_wait_flag("MTE1_MTE2", 7)
-                    T.copy(B[n_base : n_base + 128, 896:1024], b_l1[3, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 7)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 3)
-                    T.copy(a_l1[3, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 0)
-                    T.copy(A[m_base : m_base + 256, 1024:1152], a_l1[0, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 0)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 7)
-                    T.copy(b_l1[3, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[3, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 3)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[3, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[3, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[3, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 7)
-                    T.ascend_wait_flag("MTE1_MTE2", 4)
-                    T.copy(B[n_base : n_base + 128, 1024:1152], b_l1[0, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 4)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 0)
-                    T.copy(a_l1[0, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 1)
-                    T.copy(A[m_base : m_base + 256, 1152:1280], a_l1[1, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 1)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 4)
-                    T.copy(b_l1[0, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[0, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 0)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[0, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[0, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[0, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 4)
-                    T.ascend_wait_flag("MTE1_MTE2", 5)
-                    T.copy(B[n_base : n_base + 128, 1152:1280], b_l1[1, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 1)
-                    T.copy(a_l1[1, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 2)
-                    T.copy(A[m_base : m_base + 256, 1280:1408], a_l1[2, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 5)
-                    T.copy(b_l1[1, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[1, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 1)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[1, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[1, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[1, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 5)
-                    T.ascend_wait_flag("MTE1_MTE2", 6)
-                    T.copy(B[n_base : n_base + 128, 1280:1408], b_l1[2, :128, :])
-                    T.ascend_set_flag("MTE2_MTE1", 6)
-                    T.ascend_wait_flag("MTE1_M", 1)
-                    T.ascend_wait_flag("MTE1_M", 5)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[3, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 5)
-                    T.ascend_wait_flag("MTE1_M", 3)
-                    T.gemm(
-                        a_l0[1, :256, :],
-                        b_l0[1, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 1)
-                    T.ascend_set_flag("M_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 0)
-                    T.ascend_wait_flag("MTE2_MTE1", 2)
-                    T.copy(a_l1[2, 0:256, 0:64], a_l0[0, :256, :])
-                    T.ascend_set_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_MTE2", 3)
-                    T.copy(A[m_base : m_base + 256, 1408:1536], a_l1[3, :256, :])
-                    T.ascend_set_flag("MTE2_MTE1", 3)
-                    T.ascend_wait_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("MTE2_MTE1", 6)
-                    T.copy(b_l1[2, 80:128, 0:64], b_l0[2, :48, :])
-                    T.ascend_set_flag("MTE1_M", 4)
-                    T.ascend_wait_flag("MTE1_M", 0)
-                    T.ascend_wait_flag("MTE1_M", 4)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[2, :48, :],
-                        c_l0_0_1[:256, :48],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 4)
-                    T.ascend_wait_flag("M_MTE1", 1)
-                    T.copy(a_l1[2, 0:256, 64:128], a_l0[1, :256, :])
-                    T.ascend_set_flag("MTE1_M", 1)
-                    T.ascend_set_flag("MTE1_MTE2", 2)
-                    T.ascend_wait_flag("M_MTE1", 2)
-                    T.copy(b_l1[2, 0:80, 0:64], b_l0[0, :80, :])
-                    T.ascend_set_flag("MTE1_M", 2)
-                    T.ascend_wait_flag("M_MTE1", 5)
-                    T.copy(b_l1[2, 80:128, 64:128], b_l0[3, :48, :])
-                    T.ascend_set_flag("MTE1_M", 5)
-                    T.ascend_wait_flag("MTE1_M", 2)
-                    T.gemm(
-                        a_l0[0, :256, :],
-                        b_l0[0, :80, :],
-                        c_l0_0_0[:256, :80],
-                        transpose_B=True,
-                        clear_accum=False,
-                    )
-                    T.ascend_set_flag("M_MTE1", 0)
-                    T.ascend_set_flag("M_MTE1", 2)
-                    T.ascend_wait_flag("M_MTE1", 3)
-                    T.copy(b_l1[2, 0:80, 64:128], b_l0[1, :80, :])
-                    T.ascend_set_flag("MTE1_M", 3)
-                    T.ascend_set_flag("MTE1_MTE2", 6)
-                    T.ascend_wait_flag("MTE1_MTE2", 7)
+                    for cycle_0 in range(2):
+                        T.copy(
+                            B[n_base : n_base + 128, 384 + 512 * cycle_0 : 512 + 512 * cycle_0],
+                            b_l1[3, :128, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 7)
+                        T.ascend_wait_flag("MTE1_M", 1)
+                        T.ascend_wait_flag("MTE1_M", 5)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[3, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 5)
+                        T.ascend_wait_flag("MTE1_M", 3)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[1, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 1)
+                        T.ascend_set_flag("M_MTE1", 3)
+                        T.ascend_wait_flag("M_MTE1", 0)
+                        T.ascend_wait_flag("MTE2_MTE1", 3)
+                        T.copy(a_l1[3, 0:256, 0:64], a_l0[0, :256, :])
+                        T.ascend_set_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_MTE2", 0)
+                        T.copy(
+                            A[m_base : m_base + 256, 512 + 512 * cycle_0 : 640 + 512 * cycle_0],
+                            a_l1[0, :256, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 0)
+                        T.ascend_wait_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("MTE2_MTE1", 7)
+                        T.copy(b_l1[3, 80:128, 0:64], b_l0[2, :48, :])
+                        T.ascend_set_flag("MTE1_M", 4)
+                        T.ascend_wait_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_M", 4)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[2, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("M_MTE1", 1)
+                        T.copy(a_l1[3, 0:256, 64:128], a_l0[1, :256, :])
+                        T.ascend_set_flag("MTE1_M", 1)
+                        T.ascend_set_flag("MTE1_MTE2", 3)
+                        T.ascend_wait_flag("M_MTE1", 2)
+                        T.copy(b_l1[3, 0:80, 0:64], b_l0[0, :80, :])
+                        T.ascend_set_flag("MTE1_M", 2)
+                        T.ascend_wait_flag("M_MTE1", 5)
+                        T.copy(b_l1[3, 80:128, 64:128], b_l0[3, :48, :])
+                        T.ascend_set_flag("MTE1_M", 5)
+                        T.ascend_wait_flag("MTE1_M", 2)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[0, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 0)
+                        T.ascend_set_flag("M_MTE1", 2)
+                        T.ascend_wait_flag("M_MTE1", 3)
+                        T.copy(b_l1[3, 0:80, 64:128], b_l0[1, :80, :])
+                        T.ascend_set_flag("MTE1_M", 3)
+                        T.ascend_set_flag("MTE1_MTE2", 7)
+                        T.ascend_wait_flag("MTE1_MTE2", 4)
+                        T.copy(
+                            B[n_base : n_base + 128, 512 + 512 * cycle_0 : 640 + 512 * cycle_0],
+                            b_l1[0, :128, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 4)
+                        T.ascend_wait_flag("MTE1_M", 1)
+                        T.ascend_wait_flag("MTE1_M", 5)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[3, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 5)
+                        T.ascend_wait_flag("MTE1_M", 3)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[1, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 1)
+                        T.ascend_set_flag("M_MTE1", 3)
+                        T.ascend_wait_flag("M_MTE1", 0)
+                        T.ascend_wait_flag("MTE2_MTE1", 0)
+                        T.copy(a_l1[0, 0:256, 0:64], a_l0[0, :256, :])
+                        T.ascend_set_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_MTE2", 1)
+                        T.copy(
+                            A[m_base : m_base + 256, 640 + 512 * cycle_0 : 768 + 512 * cycle_0],
+                            a_l1[1, :256, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 1)
+                        T.ascend_wait_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("MTE2_MTE1", 4)
+                        T.copy(b_l1[0, 80:128, 0:64], b_l0[2, :48, :])
+                        T.ascend_set_flag("MTE1_M", 4)
+                        T.ascend_wait_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_M", 4)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[2, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("M_MTE1", 1)
+                        T.copy(a_l1[0, 0:256, 64:128], a_l0[1, :256, :])
+                        T.ascend_set_flag("MTE1_M", 1)
+                        T.ascend_set_flag("MTE1_MTE2", 0)
+                        T.ascend_wait_flag("M_MTE1", 2)
+                        T.copy(b_l1[0, 0:80, 0:64], b_l0[0, :80, :])
+                        T.ascend_set_flag("MTE1_M", 2)
+                        T.ascend_wait_flag("M_MTE1", 5)
+                        T.copy(b_l1[0, 80:128, 64:128], b_l0[3, :48, :])
+                        T.ascend_set_flag("MTE1_M", 5)
+                        T.ascend_wait_flag("MTE1_M", 2)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[0, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 0)
+                        T.ascend_set_flag("M_MTE1", 2)
+                        T.ascend_wait_flag("M_MTE1", 3)
+                        T.copy(b_l1[0, 0:80, 64:128], b_l0[1, :80, :])
+                        T.ascend_set_flag("MTE1_M", 3)
+                        T.ascend_set_flag("MTE1_MTE2", 4)
+                        T.ascend_wait_flag("MTE1_MTE2", 5)
+                        T.copy(
+                            B[n_base : n_base + 128, 640 + 512 * cycle_0 : 768 + 512 * cycle_0],
+                            b_l1[1, :128, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 5)
+                        T.ascend_wait_flag("MTE1_M", 1)
+                        T.ascend_wait_flag("MTE1_M", 5)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[3, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 5)
+                        T.ascend_wait_flag("MTE1_M", 3)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[1, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 1)
+                        T.ascend_set_flag("M_MTE1", 3)
+                        T.ascend_wait_flag("M_MTE1", 0)
+                        T.ascend_wait_flag("MTE2_MTE1", 1)
+                        T.copy(a_l1[1, 0:256, 0:64], a_l0[0, :256, :])
+                        T.ascend_set_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_MTE2", 2)
+                        T.copy(
+                            A[m_base : m_base + 256, 768 + 512 * cycle_0 : 896 + 512 * cycle_0],
+                            a_l1[2, :256, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 2)
+                        T.ascend_wait_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("MTE2_MTE1", 5)
+                        T.copy(b_l1[1, 80:128, 0:64], b_l0[2, :48, :])
+                        T.ascend_set_flag("MTE1_M", 4)
+                        T.ascend_wait_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_M", 4)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[2, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("M_MTE1", 1)
+                        T.copy(a_l1[1, 0:256, 64:128], a_l0[1, :256, :])
+                        T.ascend_set_flag("MTE1_M", 1)
+                        T.ascend_set_flag("MTE1_MTE2", 1)
+                        T.ascend_wait_flag("M_MTE1", 2)
+                        T.copy(b_l1[1, 0:80, 0:64], b_l0[0, :80, :])
+                        T.ascend_set_flag("MTE1_M", 2)
+                        T.ascend_wait_flag("M_MTE1", 5)
+                        T.copy(b_l1[1, 80:128, 64:128], b_l0[3, :48, :])
+                        T.ascend_set_flag("MTE1_M", 5)
+                        T.ascend_wait_flag("MTE1_M", 2)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[0, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 0)
+                        T.ascend_set_flag("M_MTE1", 2)
+                        T.ascend_wait_flag("M_MTE1", 3)
+                        T.copy(b_l1[1, 0:80, 64:128], b_l0[1, :80, :])
+                        T.ascend_set_flag("MTE1_M", 3)
+                        T.ascend_set_flag("MTE1_MTE2", 5)
+                        T.ascend_wait_flag("MTE1_MTE2", 6)
+                        T.copy(
+                            B[n_base : n_base + 128, 768 + 512 * cycle_0 : 896 + 512 * cycle_0],
+                            b_l1[2, :128, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 6)
+                        T.ascend_wait_flag("MTE1_M", 1)
+                        T.ascend_wait_flag("MTE1_M", 5)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[3, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 5)
+                        T.ascend_wait_flag("MTE1_M", 3)
+                        T.gemm(
+                            a_l0[1, :256, :],
+                            b_l0[1, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 1)
+                        T.ascend_set_flag("M_MTE1", 3)
+                        T.ascend_wait_flag("M_MTE1", 0)
+                        T.ascend_wait_flag("MTE2_MTE1", 2)
+                        T.copy(a_l1[2, 0:256, 0:64], a_l0[0, :256, :])
+                        T.ascend_set_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_MTE2", 3)
+                        T.copy(
+                            A[m_base : m_base + 256, 896 + 512 * cycle_0 : 1024 + 512 * cycle_0],
+                            a_l1[3, :256, :],
+                        )
+                        T.ascend_set_flag("MTE2_MTE1", 3)
+                        T.ascend_wait_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("MTE2_MTE1", 6)
+                        T.copy(b_l1[2, 80:128, 0:64], b_l0[2, :48, :])
+                        T.ascend_set_flag("MTE1_M", 4)
+                        T.ascend_wait_flag("MTE1_M", 0)
+                        T.ascend_wait_flag("MTE1_M", 4)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[2, :48, :],
+                            c_l0_0_1[:256, :48],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 4)
+                        T.ascend_wait_flag("M_MTE1", 1)
+                        T.copy(a_l1[2, 0:256, 64:128], a_l0[1, :256, :])
+                        T.ascend_set_flag("MTE1_M", 1)
+                        T.ascend_set_flag("MTE1_MTE2", 2)
+                        T.ascend_wait_flag("M_MTE1", 2)
+                        T.copy(b_l1[2, 0:80, 0:64], b_l0[0, :80, :])
+                        T.ascend_set_flag("MTE1_M", 2)
+                        T.ascend_wait_flag("M_MTE1", 5)
+                        T.copy(b_l1[2, 80:128, 64:128], b_l0[3, :48, :])
+                        T.ascend_set_flag("MTE1_M", 5)
+                        T.ascend_wait_flag("MTE1_M", 2)
+                        T.gemm(
+                            a_l0[0, :256, :],
+                            b_l0[0, :80, :],
+                            c_l0_0_0[:256, :80],
+                            transpose_B=True,
+                            clear_accum=False,
+                        )
+                        T.ascend_set_flag("M_MTE1", 0)
+                        T.ascend_set_flag("M_MTE1", 2)
+                        T.ascend_wait_flag("M_MTE1", 3)
+                        T.copy(b_l1[2, 0:80, 64:128], b_l0[1, :80, :])
+                        T.ascend_set_flag("MTE1_M", 3)
+                        T.ascend_set_flag("MTE1_MTE2", 6)
+                        T.ascend_wait_flag("MTE1_MTE2", 7)
                     T.copy(B[n_base : n_base + 128, 1408:1536], b_l1[3, :128, :])
                     T.ascend_set_flag("MTE2_MTE1", 7)
                     T.ascend_wait_flag("MTE1_M", 1)

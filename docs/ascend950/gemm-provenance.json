@@ -1,0 +1,1051 @@
+{
+  "schema_version": 1,
+  "scope": "Historical 950DT development measurements; not public protocol acceptance. Source hashes identify recovered original kernels, not modified ports.",
+  "device": {
+    "model": "Ascend 950DT",
+    "cube_count": 36,
+    "dense_bf16_peak_tflops": 486
+  },
+  "deepgemm_commit": "8491bbb4b8c02a094a2318965f50c70438a3e73c",
+  "manifest_commit": "b84f999c9ec5d375bcedb62b44d79863f830924a",
+  "manifest_source_sha256": "9541060761464153d658666d92c866427eaceb6a2b179c52014e53f09992bc38",
+  "selection": "Manual DeepGEMM geometry/depth alignment plus schedule search; not unattended autotuning.",
+  "validation": "Recovered original sources match both historical manifest and runtime binding hashes; schedule hashes match runtime bindings. Seeds 0, 1, 7 were bitwise equal to DeepGEMM. All 11 archived pre/during/post occupancy checks have no foreign process; final post memory is below the historical idle ceiling. No new runtime validation.",
+  "protocol": "10 warmups and 30 timed invocations per arm, round-robin capture, 2xL2 zero before each timed arm, historical profiler device-kernel duration median. No receipt under the forthcoming maintained public performance protocol.",
+  "cases": [
+    {
+      "historical_case": "W1",
+      "case_id": "ds-v3-decode-down-bfloat16",
+      "shape": [
+        128,
+        7168,
+        2048
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "6b620386b457b3c682c264bd3e7d9d8d9057ad0b38533b8f7fd8780f84b25907",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 128,
+        "m": 128,
+        "mad_k": 64,
+        "mad_m": 128,
+        "mad_n": 208,
+        "n": 208
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 128,
+          "n": 208,
+          "count": 34,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 1,
+            "b_l0": 2,
+            "b_l1": 2,
+            "c_l0": 1
+          }
+        },
+        {
+          "m": 128,
+          "n": 96,
+          "count": 1,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 2,
+            "b_l0": 2,
+            "b_l1": 1,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 15.825,
+          "p10": 15.9361,
+          "median": 16.234,
+          "p90": 16.4713,
+          "mean": 16.223033333333333
+        },
+        "tflops": 231.49540372058638,
+        "peak_percent": 47.63279911946221,
+        "samples": 30,
+        "half_run_median_ratio": 0.9997536338999754
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 16.092,
+          "p10": 16.2311,
+          "median": 16.6085,
+          "p90": 17.157,
+          "mean": 16.62933333333333
+        },
+        "tflops": 226.27548448083812,
+        "peak_percent": 46.55874166272389,
+        "samples": 30,
+        "half_run_median_ratio": 1.0021095774817672
+      },
+      "throughput_ratio": 1.0230688678083033,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W2",
+      "case_id": "ds-v3-decode-qkv-a-bfloat16",
+      "shape": [
+        128,
+        2112,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "b1612bb04be34195b45c6e55e9fe6379899957203cfb62e38d95783cf3fba328",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 256,
+        "m": 128,
+        "mad_k": 128,
+        "mad_m": 128,
+        "mad_n": 64,
+        "n": 64
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 128,
+          "n": 64,
+          "count": 33,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 2,
+            "b_l0": 2,
+            "b_l1": 1,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 28.068,
+          "p10": 28.392400000000002,
+          "median": 28.877000000000002,
+          "p90": 29.1463,
+          "mean": 28.806300000000004
+        },
+        "tflops": 134.2084321778578,
+        "peak_percent": 27.614903740299958,
+        "samples": 30,
+        "half_run_median_ratio": 0.9927353236240357
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 24.346,
+          "p10": 24.4327,
+          "median": 24.9165,
+          "p90": 25.633,
+          "mean": 24.95296666666666
+        },
+        "tflops": 155.54098272229245,
+        "peak_percent": 32.00431743257046,
+        "samples": 30,
+        "half_run_median_ratio": 0.9940366605298967
+      },
+      "throughput_ratio": 0.8628493264535789,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W3",
+      "case_id": "ds-v3-prefill-mlp-up-bfloat16",
+      "shape": [
+        4096,
+        4096,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "51f2c7f967eaf9d32ea2be6448b78fed76b37640158cb78946b7e2b833b326f3",
+      "tile": {
+        "k": 128,
+        "m": 224,
+        "mad_k": 64,
+        "mad_m": 224,
+        "mad_n": 128,
+        "n": 256
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 224,
+          "n": 256,
+          "count": 288,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 3,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        },
+        {
+          "m": 64,
+          "n": 256,
+          "count": 16,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 3,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 541.319,
+          "p10": 543.2164,
+          "median": 545.3095,
+          "p90": 547.1559,
+          "mean": 545.1407000000002
+        },
+        "tflops": 441.06726285898196,
+        "peak_percent": 90.75458083518147,
+        "samples": 30,
+        "half_run_median_ratio": 1.0011964224765946
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 524.759,
+          "p10": 524.9315,
+          "median": 525.3320000000001,
+          "p90": 526.1981000000001,
+          "mean": 525.5047666666667
+        },
+        "tflops": 457.84031541196794,
+        "peak_percent": 94.2058262164543,
+        "samples": 30,
+        "half_run_median_ratio": 1.000416981624248
+      },
+      "throughput_ratio": 0.963364841434085,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W5",
+      "case_id": "ds-v3-prefill-down-bfloat16",
+      "shape": [
+        4096,
+        7168,
+        2048
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "0e3b88e62bb399887b21ab60574ab6dcd03d94c97e516b61f6a14af2b30792db",
+      "tile": {
+        "k": 128,
+        "m": 256,
+        "mad_k": 64,
+        "mad_m": 256,
+        "mad_n": 80,
+        "n": 160
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 256,
+          "n": 160,
+          "count": 704,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 3,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        },
+        {
+          "m": 256,
+          "n": 128,
+          "count": 16,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 4,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 308.578,
+          "p10": 309.48580000000004,
+          "median": 312.2555,
+          "p90": 314.72790000000003,
+          "mean": 312.0705333333333
+        },
+        "tflops": 385.1303957432295,
+        "peak_percent": 79.24493739572624,
+        "samples": 30,
+        "half_run_median_ratio": 0.9983987651276665
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 274.115,
+          "p10": 274.3447,
+          "median": 274.9595,
+          "p90": 275.93129999999996,
+          "mean": 275.1291
+        },
+        "tflops": 437.370173745588,
+        "peak_percent": 89.99386291061481,
+        "samples": 30,
+        "half_run_median_ratio": 0.9985977047405572
+      },
+      "throughput_ratio": 0.8805593496351546,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W6",
+      "case_id": "ds-v3-prefill-qkv-a-bfloat16",
+      "shape": [
+        4096,
+        2112,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "69bcd9514e8a36cb5a557ff4c4c8a7f10866071668f2b5fb2e853d0dde299b01",
+      "tile": {
+        "k": 128,
+        "m": 256,
+        "mad_k": 64,
+        "mad_m": 128,
+        "mad_n": 240,
+        "n": 240
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 256,
+          "n": 240,
+          "count": 128,
+          "versions": {
+            "a_l0": 3,
+            "a_l1": 4,
+            "b_l0": 2,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_1_0": 1
+          }
+        },
+        {
+          "m": 256,
+          "n": 192,
+          "count": 16,
+          "versions": {
+            "a_l0": 3,
+            "a_l1": 4,
+            "b_l0": 2,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_1_0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 277.694,
+          "p10": 277.9585,
+          "median": 278.11350000000004,
+          "p90": 278.2519,
+          "mean": 278.13883333333337
+        },
+        "tflops": 445.9229079926001,
+        "peak_percent": 91.75368477213993,
+        "samples": 30,
+        "half_run_median_ratio": 0.9997196039945646
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 266.638,
+          "p10": 266.81010000000003,
+          "median": 267.0265,
+          "p90": 267.19840000000005,
+          "mean": 267.0251
+        },
+        "tflops": 464.4377268623152,
+        "peak_percent": 95.56331828442698,
+        "samples": 30,
+        "half_run_median_ratio": 1.0002284738322553
+      },
+      "throughput_ratio": 0.9601349808621299,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W7",
+      "case_id": "ds-v3-prefill-o-proj-bfloat16",
+      "shape": [
+        4096,
+        7168,
+        16384
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "ff0cb96acd59fba3835b4440431bda588fc9878ba4e81c2506aad9960f37b64a",
+      "tile": {
+        "k": 128,
+        "m": 256,
+        "mad_k": 64,
+        "mad_m": 256,
+        "mad_n": 80,
+        "n": 160
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 256,
+          "n": 160,
+          "count": 704,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 3,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        },
+        {
+          "m": 256,
+          "n": 128,
+          "count": 16,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 4,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 2080.25,
+          "p10": 2083.4066000000003,
+          "median": 2203.6515,
+          "p90": 2829.1794999999997,
+          "mean": 2387.0842333333335
+        },
+        "tflops": 436.58113558518664,
+        "peak_percent": 89.83150937966803,
+        "samples": 30,
+        "half_run_median_ratio": 1.2421235876858776
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 2105.619,
+          "p10": 2106.8549,
+          "median": 2197.3955,
+          "p90": 2740.4096,
+          "mean": 2353.0568333333335
+        },
+        "tflops": 437.8240850607002,
+        "peak_percent": 90.0872603005556,
+        "samples": 30,
+        "half_run_median_ratio": 1.23683443736176
+      },
+      "throughput_ratio": 0.9971610756056483,
+      "stability_warning": {
+        "deepgemm": 1.23683443736176,
+        "ours": 1.2421235876858776,
+        "example": 1.2808412794783246
+      },
+      "public_acceptance": "not_run",
+      "import_status": "deferred_not_in_public_dispatch"
+    },
+    {
+      "historical_case": "W8",
+      "case_id": "ds-v3-m16-mlp-up-bfloat16",
+      "shape": [
+        16,
+        4096,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "80f8005c5bff1507bb633973dceb748572dd6b4b7945393530744437d8edce08",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 256,
+        "m": 16,
+        "mad_k": 128,
+        "mad_m": 16,
+        "mad_n": 128,
+        "n": 128
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 16,
+          "n": 128,
+          "count": 32,
+          "versions": {
+            "a_l0": 1,
+            "a_l1": 1,
+            "b_l0": 2,
+            "b_l1": 2,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 23.959,
+          "p10": 24.265,
+          "median": 24.6645,
+          "p90": 25.023,
+          "mean": 24.653666666666666
+        },
+        "tflops": 38.09216063573152,
+        "peak_percent": 7.8378931349241805,
+        "samples": 30,
+        "half_run_median_ratio": 0.982429981865807
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 21.552,
+          "p10": 21.6856,
+          "median": 22.139499999999998,
+          "p90": 22.5033,
+          "mean": 22.114899999999995
+        },
+        "tflops": 42.43655439373066,
+        "peak_percent": 8.731801315582441,
+        "samples": 30,
+        "half_run_median_ratio": 1.0034409381083895
+      },
+      "throughput_ratio": 0.8976261428368707,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W9",
+      "case_id": "ds-v3-m32-mlp-up-bfloat16",
+      "shape": [
+        32,
+        4096,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "4ef27e4ee5ae1d0954343f3f0e39df5a47e6e31de44a47dc34ba00fc8c0e11f0",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 256,
+        "m": 32,
+        "mad_k": 128,
+        "mad_m": 32,
+        "mad_n": 128,
+        "n": 128
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 32,
+          "n": 128,
+          "count": 32,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 1,
+            "b_l0": 2,
+            "b_l1": 2,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 26.109,
+          "p10": 26.251,
+          "median": 26.795,
+          "p90": 27.3198,
+          "mean": 26.79643333333333
+        },
+        "tflops": 70.12682186975181,
+        "peak_percent": 14.429387215998316,
+        "samples": 30,
+        "half_run_median_ratio": 0.9942672076834307
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 24.172,
+          "p10": 24.2669,
+          "median": 24.523,
+          "p90": 24.9705,
+          "mean": 24.5546
+        },
+        "tflops": 76.62391191942258,
+        "peak_percent": 15.766237020457321,
+        "samples": 30,
+        "half_run_median_ratio": 0.9967004765978248
+      },
+      "throughput_ratio": 0.9152080612054487,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W10",
+      "case_id": "ds-v3-m64-down-bfloat16",
+      "shape": [
+        64,
+        7168,
+        2048
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "844e450f526e9b20736db8d9d3585cba2b3d115f1a468b41fd3fc5724982cc5c",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 128,
+        "m": 64,
+        "mad_k": 64,
+        "mad_m": 64,
+        "mad_n": 208,
+        "n": 208
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 64,
+          "n": 208,
+          "count": 34,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 1,
+            "b_l0": 2,
+            "b_l1": 2,
+            "c_l0": 1
+          }
+        },
+        {
+          "m": 64,
+          "n": 96,
+          "count": 1,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 2,
+            "b_l0": 2,
+            "b_l1": 2,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 13.467,
+          "p10": 13.6058,
+          "median": 13.927,
+          "p90": 14.4009,
+          "mean": 13.9782
+        },
+        "tflops": 134.9212459251813,
+        "peak_percent": 27.761573235634014,
+        "samples": 30,
+        "half_run_median_ratio": 1.0015809140557632
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 13.179,
+          "p10": 13.6631,
+          "median": 14.472000000000001,
+          "p90": 15.171,
+          "mean": 14.464566666666668
+        },
+        "tflops": 129.84025649530128,
+        "peak_percent": 26.71610215952701,
+        "samples": 30,
+        "half_run_median_ratio": 0.9926379523875052
+      },
+      "throughput_ratio": 1.0391326200904718,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W11",
+      "case_id": "ds-v3-m96-qkv-a-bfloat16",
+      "shape": [
+        96,
+        2112,
+        7168
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "75a9899ccbe278272f0c55834f048d208ec2bf9fe2a122437bafbbae539f7097",
+      "tile": {
+        "b_l2_cache": 4,
+        "k": 256,
+        "m": 96,
+        "mad_k": 128,
+        "mad_m": 96,
+        "mad_n": 64,
+        "n": 64
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 96,
+          "n": 64,
+          "count": 33,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 2,
+            "b_l0": 2,
+            "b_l1": 1,
+            "c_l0": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 27.629,
+          "p10": 28.1228,
+          "median": 28.5845,
+          "p90": 28.961,
+          "mean": 28.515266666666673
+        },
+        "tflops": 101.68632202767235,
+        "peak_percent": 20.92311152832764,
+        "samples": 30,
+        "half_run_median_ratio": 1.0085773543783176
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 20.967,
+          "p10": 21.027099999999997,
+          "median": 21.365000000000002,
+          "p90": 21.6673,
+          "mean": 21.3764
+        },
+        "tflops": 136.04739864263982,
+        "peak_percent": 27.993291901777738,
+        "samples": 30,
+        "half_run_median_ratio": 0.9970548361460427
+      },
+      "throughput_ratio": 0.7474330493799088,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    },
+    {
+      "historical_case": "W14",
+      "case_id": "ds-v3-prefill-q-b-bfloat16",
+      "shape": [
+        4096,
+        24576,
+        1536
+      ],
+      "dtype": "bfloat16",
+      "trans_a": false,
+      "trans_b": true,
+      "source_sha256": "642649ac67e639dffa0fff91ac71fea00a693893386e899bad6c005abbc394da",
+      "tile": {
+        "k": 128,
+        "m": 256,
+        "mad_k": 64,
+        "mad_m": 256,
+        "mad_n": 128,
+        "n": 256
+      },
+      "buffer_versions_by_tile_class": [
+        {
+          "m": 256,
+          "n": 256,
+          "count": 1536,
+          "versions": {
+            "a_l0": 2,
+            "a_l1": 4,
+            "b_l0": 3,
+            "b_l1": 4,
+            "c_l0_0_0": 1,
+            "c_l0_0_1": 1
+          }
+        }
+      ],
+      "ours": {
+        "latency_us": {
+          "min": 731.745,
+          "p10": 732.7832000000001,
+          "median": 736.4225,
+          "p90": 744.4566,
+          "mean": 737.3092333333334
+        },
+        "tflops": 419.91879024880416,
+        "peak_percent": 86.4030432610708,
+        "samples": 30,
+        "half_run_median_ratio": 0.9972045329698277
+      },
+      "deepgemm": {
+        "latency_us": {
+          "min": 645.084,
+          "p10": 645.3235,
+          "median": 645.6105,
+          "p90": 645.9538,
+          "mean": 645.5999666666667
+        },
+        "tflops": 478.9848450606054,
+        "peak_percent": 98.55655248160605,
+        "samples": 30,
+        "half_run_median_ratio": 1.000037174663608
+      },
+      "throughput_ratio": 0.8766849193228072,
+      "stability_warning": {},
+      "public_acceptance": "not_run",
+      "import_status": "prepared_for_import"
+    }
+  ],
+  "uncovered_public_cases": [
+    "square-1k-float16",
+    "square-1k-bfloat16",
+    "ds-v3-prefill-mlp-up-float16",
+    "ds-v3-m1-qkv-a-bfloat16",
+    "ds-v3-m2-qkv-a-bfloat16",
+    "qwen3-8b-gate-up-decode-bfloat16",
+    "qwen3-8b-gate-up-b32-bfloat16",
+    "qwen3-8b-down-prefill-bfloat16",
+    "vit-l16-in21k-head-bfloat16"
+  ],
+  "import_scope": {
+    "prepared_count": 10,
+    "public_case_count": 20,
+    "deferred_historical_cases": [
+      "W7"
+    ],
+    "reason": "W7 original source is 905929 bytes, above the 500 KiB source-file check, and has material timing drift. No lint exemption.",
+    "pending_public_cases": [
+      "ds-v3-prefill-o-proj-bfloat16",
+      "square-1k-float16",
+      "square-1k-bfloat16",
+      "ds-v3-prefill-mlp-up-float16",
+      "ds-v3-m1-qkv-a-bfloat16",
+      "ds-v3-m2-qkv-a-bfloat16",
+      "qwen3-8b-gate-up-decode-bfloat16",
+      "qwen3-8b-gate-up-b32-bfloat16",
+      "qwen3-8b-down-prefill-bfloat16",
+      "vit-l16-in21k-head-bfloat16"
+    ]
+  },
+  "public_performance_status": {
+    "status": "pending",
+    "roadmap": "https://github.com/yyttt6/TileOPs/issues/1",
+    "policy": "Platform default configuration; updated public performance entry point and baseline package pending publication. Historical locked-clock development documentation is not the next acceptance target."
+  },
+  "source_ports": [
+    {
+      "case": "W1",
+      "shape": [
+        128,
+        7168,
+        2048
+      ],
+      "module": "bf16_nt_128_7168_2048_dt",
+      "measured_source_sha256": "6b620386b457b3c682c264bd3e7d9d8d9057ad0b38533b8f7fd8780f84b25907",
+      "port_sha256": "1ae2109592c0ee5406c7fa9b94e80183b2e8d898b8b661e2018d2ce131443fc0",
+      "port_bytes": 75261,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W2",
+      "shape": [
+        128,
+        2112,
+        7168
+      ],
+      "module": "bf16_nt_128_2112_7168_dt",
+      "measured_source_sha256": "b1612bb04be34195b45c6e55e9fe6379899957203cfb62e38d95783cf3fba328",
+      "port_sha256": "f4a2a83b97bb1f1998da5592e667ed3695ecf45465a6083bc003e3d387eb502d",
+      "port_bytes": 51382,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W3",
+      "shape": [
+        4096,
+        4096,
+        7168
+      ],
+      "module": "bf16_nt_4096_4096_7168_dt",
+      "measured_source_sha256": "51f2c7f967eaf9d32ea2be6448b78fed76b37640158cb78946b7e2b833b326f3",
+      "port_sha256": "bfd35c741a4b34e35607451110175df74fe29da35184fa882213c12287926cff",
+      "port_bytes": 370045,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W5",
+      "shape": [
+        4096,
+        7168,
+        2048
+      ],
+      "module": "bf16_nt_4096_7168_2048_dt",
+      "measured_source_sha256": "0e3b88e62bb399887b21ab60574ab6dcd03d94c97e516b61f6a14af2b30792db",
+      "port_sha256": "00e29aae47ac9d8466c3f83b6d6e6030d33ad71131b4001174bf972a1213a93e",
+      "port_bytes": 105546,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W6",
+      "shape": [
+        4096,
+        2112,
+        7168
+      ],
+      "module": "bf16_nt_4096_2112_7168_dt",
+      "measured_source_sha256": "69bcd9514e8a36cb5a557ff4c4c8a7f10866071668f2b5fb2e853d0dde299b01",
+      "port_sha256": "f48cbb1dd9308b766801b3fbde7cd81425f2d098b0db01f0109199f83a0a3f1e",
+      "port_bytes": 370852,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W8",
+      "shape": [
+        16,
+        4096,
+        7168
+      ],
+      "module": "bf16_nt_16_4096_7168_dt",
+      "measured_source_sha256": "80f8005c5bff1507bb633973dceb748572dd6b4b7945393530744437d8edce08",
+      "port_sha256": "9c8acc4ab94e69a4fba9481fdbd9eb51f315d4f39ce40b0a0eb95ba822985938",
+      "port_bytes": 52497,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W9",
+      "shape": [
+        32,
+        4096,
+        7168
+      ],
+      "module": "bf16_nt_32_4096_7168_dt",
+      "measured_source_sha256": "4ef27e4ee5ae1d0954343f3f0e39df5a47e6e31de44a47dc34ba00fc8c0e11f0",
+      "port_sha256": "ba09a265704e0295df00ddc01aeb3080d268383949e5eeac612ad0782a6c3d59",
+      "port_bytes": 52402,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W10",
+      "shape": [
+        64,
+        7168,
+        2048
+      ],
+      "module": "bf16_nt_64_7168_2048_dt",
+      "measured_source_sha256": "844e450f526e9b20736db8d9d3585cba2b3d115f1a468b41fd3fc5724982cc5c",
+      "port_sha256": "5e1a43df8b0193607e2c7f83a10244fbff1519719e35ba6985f5abb4b8d5da1e",
+      "port_bytes": 74776,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W11",
+      "shape": [
+        96,
+        2112,
+        7168
+      ],
+      "module": "bf16_nt_96_2112_7168_dt",
+      "measured_source_sha256": "75a9899ccbe278272f0c55834f048d208ec2bf9fe2a122437bafbbae539f7097",
+      "port_sha256": "36bdc05bc48662419f9caca999efa23d25e608e6ce44d08c90a83dacb4715043",
+      "port_bytes": 51347,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    },
+    {
+      "case": "W14",
+      "shape": [
+        4096,
+        24576,
+        1536
+      ],
+      "module": "bf16_nt_4096_24576_1536_dt",
+      "measured_source_sha256": "642649ac67e639dffa0fff91ac71fea00a693893386e899bad6c005abbc394da",
+      "port_sha256": "26acf129a33cf16f95543510b80558fa65446fb314b0c5677c612922439791fb",
+      "port_bytes": 37557,
+      "ast_equivalent": true,
+      "changes": [
+        "remove task/model-start comments",
+        "ruff 0.16.5 formatting",
+        "SIM117 explanatory suppression preserves measured AST"
+      ],
+      "device_validation": "not_run"
+    }
+  ]
+}
